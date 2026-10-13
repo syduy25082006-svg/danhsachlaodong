@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Tài Liệu Thư Viện</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h2, h3 {
+            color: #333;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .dynamic-fields {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border: 1px dashed #ddd;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+        .filter-box {
+            margin: 20px 0 10px 0;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>QUẢN LÝ TÀI LIỆU THƯ VIỆN</h2>
+
+    <!-- Form Nhập Liệu -->
+    <div class="form-group">
+        <label>Chọn loại tài liệu:</label>
+        <select id="loaiTaiLieu" onchange="doiLoaiTaiLieu()">
+            <option value="Sach">Sách</option>
+            <option value="TapChi">Tạp chí</option>
+            <option value="Bao">Báo</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Mã tài liệu (Duy nhất):</label>
+        <input type="text" id="maTaiLieu" placeholder="Nhập mã tài liệu...">
+    </div>
+
+    <div class="form-group">
+        <label>Tên nhà xuất bản:</label>
+        <input type="text" id="tenNXB" placeholder="Nhập tên nhà xuất bản...">
+    </div>
+
+    <div class="form-group">
+        <label>Số bản phát hành:</label>
+        <input type="number" id="soBanPH" placeholder="Nhập số bản phát hành...">
+    </div>
+
+    <!-- Các thuộc tính riêng biệt -->
+    <div id="nhomSach" class="dynamic-fields">
+        <div class="form-group">
+            <label>Tên tác giả:</label>
+            <input type="text" id="tenTacGia" placeholder="Nhập tên tác giả...">
+        </div>
+        <div class="form-group">
+            <label>Số trang:</label>
+            <input type="number" id="soTrang" placeholder="Nhập số trang...">
+        </div>
+    </div>
+
+    <div id="nhomTapChi" class="dynamic-fields" style="display: none;">
+        <div class="form-group">
+            <label>Số phát hành:</label>
+            <input type="number" id="soPhatHanhTC" placeholder="Nhập số phát hành...">
+        </div>
+        <div class="form-group">
+            <label>Tháng phát hành:</label>
+            <input type="number" id="thangPhatHanh" placeholder="Nhập tháng (1-12)...">
+        </div>
+    </div>
+
+    <div id="nhomBao" class="dynamic-fields" style="display: none;">
+        <div class="form-group">
+            <label>Ngày phát hành:</label>
+            <input type="date" id="ngayPhatHanh">
+        </div>
+    </div>
+
+    <button onclick="themTaiLieu()">Thêm Mới Tài Liệu</button>
+
+    <!-- Bộ lọc tìm kiếm theo loại -->
+    <div class="filter-box">
+        <label style="width: 150px;">Lọc xem theo loại:</label>
+        <select id="boLoc" onchange="hienThiDanhSach()">
+            <option value="TatCa">-- Hiển thị tất cả --</option>
+            <option value="Sach">Sách</option>
+            <option value="TapChi">Tạp chí</option>
+            <option value="Bao">Báo</option>
+        </select>
+    </div>
+
+    <!-- Bảng hiển thị danh sách -->
+    <h3>Danh Sách Tài Liệu</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Mã TL</th>
+                <th>Loại</th>
+                <th>Nhà Xuất Bản</th>
+                <th>Số Bản</th>
+                <th>Thông Tin Chi Tiết Riêng</th>
+                <th>Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody id="bangDuLieu">
+            <!-- Dữ liệu hiển thị tự động ở đây -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    let danhSach = [];
+
+    function doiLoaiTaiLieu() {
+        let loai = document.getElementById("loaiTaiLieu").value;
+        document.getElementById("nhomSach").style.display = (loai === "Sach") ? "block" : "none";
+        document.getElementById("nhomTapChi").style.display = (loai === "TapChi") ? "block" : "none";
+        document.getElementById("nhomBao").style.display = (loai === "Bao") ? "block" : "none";
+    }
+
+    function themTaiLieu() {
+        let loai = document.getElementById("loaiTaiLieu").value;
+        let ma = document.getElementById("maTaiLieu").value.trim();
+        let nxb = document.getElementById("tenNXB").value.trim();
+        let soBan = document.getElementById("soBanPH").value;
+
+        if (!ma || !nxb || !soBan) {
+            alert("Vui lòng nhập đầy đủ các thông tin chung!");
+            return;
+        }
+
+        // Kiểm tra trùng mã
+        if (danhSach.some(item => item.ma === ma)) {
+            alert("Mã tài liệu này đã tồn tại, vui lòng nhập mã khác!");
+            return;
+        }
+
+        let item = { ma, nxb, soBan, loai, chiTiet: "" };
+
+        if (loai === "Sach") {
+            let tg = document.getElementById("tenTacGia").value.trim();
+            let trang = document.getElementById("soTrang").value;
+            if (!tg || !trang) { alert("Vui lòng nhập thông tin sách!"); return; }
+            item.chiTiet = `Tác giả: ${tg} | Số trang: ${trang}`;
+        } else if (loai === "TapChi") {
+            let sph = document.getElementById("soPhatHanhTC").value;
+            let tph = document.getElementById("thangPhatHanh").value;
+            if (!sph || !tph) { alert("Vui lòng nhập thông tin tạp chí!"); return; }
+            item.chiTiet = `Số PH: ${sph} | Tháng PH: ${tph}`;
+        } else if (loai === "Bao") {
+            let ngay = document.getElementById("ngayPhatHanh").value;
+            if (!ngay) { alert("Vui lòng chọn ngày phát hành báo!"); return; }
+            item.chiTiet = `Ngày PH: ${ngay}`;
+        }
+
+        danhSach.push(item);
+        hienThiDanhSach();
+        lamSachForm();
+        alert("Thêm tài liệu thành công!");
+    }
+
+    function xoaTaiLieu(ma) {
+        if (confirm("Bạn có chắc chắn muốn xóa tài liệu mã: " + ma + " không?")) {
+            danhSach = danhSach.filter(item => item.ma !== ma);
+            hienThiDanhSach();
+        }
+    }
+
+    function hienThiDanhSach() {
+        let tbody = document.getElementById("bangDuLieu");
+        let loc = document.getElementById("boLoc").value;
+        tbody.innerHTML = "";
+
+        let dsHienThi = danhSach;
+        if (loc !== "TatCa") {
+            dsHienThi = danhSach.filter(item => item.loai === loc);
+        }
+
+        if (dsHienThi.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #777;">Không có tài liệu nào trong danh sách.</td></tr>`;
+            return;
+        }
+
+        dsHienThi.forEach(item => {
+            let tenLoaiHienThi = item.loai === "Sach" ? "Sách" : (item.loai === "TapChi" ? "Tạp chí" : "Báo");
+            let row = `<tr>
+                <td><b>${item.ma}</b></td>
+                <td>${tenLoaiHienThi}</td>
+                <td>${item.nxb}</td>
+                <td>${item.soBan}</td>
+                <td>${item.chiTiet}</td>
+                <td><button class="btn-delete" onclick="xoaTaiLieu('${item.ma}')">Xóa</button></td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function lamSachForm() {
+        document.getElementById("maTaiLieu").value = "";
+        document.getElementById("tenNXB").value = "";
+        document.getElementById("soBanPH").value = "";
+        document.getElementById("tenTacGia").value = "";
+        document.getElementById("soTrang").value = "";
+        document.getElementById("soPhatHanhTC").value = "";
+        document.getElementById("thangPhatHanh").value = "";
+        document.getElementById("ngayPhatHanh").value = "";
+    }
+</script>
+
+</body>
+</html>
