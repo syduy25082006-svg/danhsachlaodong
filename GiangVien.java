@@ -1,0 +1,21 @@
+public class GiangVien extends NguoilaoDong {
+    private int soTietDay;
+    private double thongLaoTiet; // hoặc donGiaTiet
+
+    public GiangVien(String hoTen, String maSo, double luongCoBan, int soTietDay, double thongLaoTiet) {
+        super(hoTen, maSo, luongCoBan);
+        this.soTietDay = soTietDay;
+        this.thongLaoTiet = thongLaoTiet;
+    }
+
+    @Override
+    public double tinhLuong() {
+        return luongCoBan + (soTietDay * thongLaoTiet);
+    }
+
+    @Override
+    public void hienThiThongTin() {
+        super.hienThiThongTin();
+        System.out.println("Chuc vu: Giang vien | So tiet: " + soTietDay + " | Tong luong: " + tinhLuong());
+    }
+}
